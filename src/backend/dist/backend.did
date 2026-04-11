@@ -1,0 +1,223 @@
+type _ImmutableObjectStorageRefillResult = 
+ record {
+   success: opt bool;
+   topped_up_amount: opt nat;
+ };
+type _ImmutableObjectStorageRefillInformation = record {
+                                                  proposed_top_up_amount:
+                                                   opt nat;};
+type _ImmutableObjectStorageCreateCertificateResult = 
+ record {
+   blob_hash: text;
+   method: text;
+ };
+type Timestamp = int;
+type StudentView = 
+ record {
+   applicationId: opt ApplicationId;
+   courseId: CourseId;
+   createdAt: Timestamp;
+   email: text;
+   enrolled: bool;
+   id: StudentId;
+   name: text;
+   phone: text;
+   profilePicture: opt text;
+   username: text;
+ };
+type StudentUpdateInput = 
+ record {
+   courseId: opt CourseId;
+   email: opt text;
+   enrolled: opt bool;
+   name: opt text;
+   phone: opt text;
+ };
+type StudentInput = 
+ record {
+   applicationId: opt ApplicationId;
+   courseId: CourseId;
+   email: text;
+   name: text;
+   password: text;
+   phone: text;
+   username: text;
+ };
+type StudentId = nat;
+type NoticeId = nat;
+type Notice = 
+ record {
+   content: text;
+   id: NoticeId;
+   postedAt: Timestamp;
+   title: text;
+ };
+type LeaveStatus = 
+ variant {
+   approved;
+   pending;
+   rejected;
+ };
+type LeaveRequestView = 
+ record {
+   endDate: text;
+   id: LeaveRequestId;
+   leaveStatus: LeaveStatus;
+   reason: text;
+   respondedAt: opt Timestamp;
+   startDate: text;
+   studentId: StudentId;
+   submittedAt: Timestamp;
+ };
+type LeaveRequestInput = 
+ record {
+   endDate: text;
+   reason: text;
+   startDate: text;
+ };
+type LeaveRequestId = nat;
+type ExternalBlob = blob;
+type CourseId = text;
+type Course = 
+ record {
+   benefits: vec text;
+   description: text;
+   durationMonths: nat;
+   id: CourseId;
+   name: text;
+ };
+type CertificateId = nat;
+type Certificate = 
+ record {
+   certificateCode: text;
+   courseId: CourseId;
+   courseName: text;
+   id: CertificateId;
+   issuedAt: Timestamp;
+   studentId: StudentId;
+   studentName: text;
+ };
+type AttendanceSummary = 
+ record {
+   absent: nat;
+   late: nat;
+   present: nat;
+   total: nat;
+ };
+type AttendanceStatus = 
+ variant {
+   absent;
+   late;
+   present;
+ };
+type AttendanceRecord = 
+ record {
+   date: text;
+   id: AttendanceId;
+   markedAt: Timestamp;
+   status: AttendanceStatus;
+   studentId: StudentId;
+ };
+type AttendanceId = nat;
+type ApplicationStatus = 
+ variant {
+   approved;
+   pending;
+   rejected;
+ };
+type ApplicationInput = 
+ record {
+   aadhaar: opt ExternalBlob;
+   courseId: CourseId;
+   email: text;
+   marksheet10: opt ExternalBlob;
+   marksheet12: opt ExternalBlob;
+   name: text;
+   passCertificate: opt ExternalBlob;
+   phone: text;
+   photo: opt ExternalBlob;
+ };
+type ApplicationId = nat;
+type AdmissionApplicationView = 
+ record {
+   aadhaar: opt ExternalBlob;
+   courseId: CourseId;
+   email: text;
+   id: ApplicationId;
+   marksheet10: opt ExternalBlob;
+   marksheet12: opt ExternalBlob;
+   name: text;
+   passCertificate: opt ExternalBlob;
+   phone: text;
+   photo: opt ExternalBlob;
+   status: ApplicationStatus;
+   submittedAt: Timestamp;
+ };
+service : {
+  _immutableObjectStorageBlobsAreLive: (hashes: vec blob) -> (vec bool) query;
+  _immutableObjectStorageBlobsToDelete: () -> (vec blob) query;
+  _immutableObjectStorageConfirmBlobDeletion: (blobs: vec blob) -> ();
+  _immutableObjectStorageCreateCertificate: (blobHash: text) ->
+   (_ImmutableObjectStorageCreateCertificateResult);
+  _immutableObjectStorageRefillCashier: (refillInformation:
+   opt _ImmutableObjectStorageRefillInformation) ->
+   (_ImmutableObjectStorageRefillResult);
+  _immutableObjectStorageUpdateGatewayPrincipals: () -> ();
+  adminCreateStudent: (loginId: text, password: text, input: StudentInput) ->
+   (StudentView);
+  adminDeleteApplication: (loginId: text, password: text, applicationId:
+   ApplicationId) -> (bool);
+  adminDeleteCertificate: (loginId: text, password: text, certificateId:
+   CertificateId) -> (bool);
+  adminDeleteLeaveRequest: (loginId: text, password: text, id:
+   LeaveRequestId) -> (bool);
+  adminDeleteNotice: (loginId: text, password: text, id: NoticeId) -> (bool);
+  adminDeleteStudent: (loginId: text, password: text, studentId:
+   StudentId) -> (bool);
+  adminGetStudent: (loginId: text, password: text, id: StudentId) ->
+   (opt StudentView) query;
+  adminGetStudentAttendance: (loginId: text, password: text, studentId:
+   StudentId) -> (vec AttendanceRecord) query;
+  adminIssueCertificate: (loginId: text, password: text, studentId:
+   StudentId) -> (Certificate);
+  adminListApplications: (loginId: text, password: text) ->
+   (vec AdmissionApplicationView);
+  adminListCertificates: (loginId: text, password: text) ->
+   (vec Certificate) query;
+  adminListLeaveRequests: (loginId: text, password: text) ->
+   (vec LeaveRequestView) query;
+  adminListStudents: (loginId: text, password: text) -> (vec StudentView);
+  adminLogin: (loginId: text, password: text) -> (bool);
+  adminMarkAttendance: (loginId: text, password: text, studentId: StudentId,
+   date: text, status: AttendanceStatus) -> (AttendanceRecord);
+  adminPostNotice: (loginId: text, password: text, title: text, content:
+   text) -> (Notice);
+  adminRespondLeaveRequest: (loginId: text, password: text, id:
+   LeaveRequestId, status: LeaveStatus) -> (bool);
+  adminUpdateApplicationStatus: (loginId: text, password: text, id:
+   ApplicationId, status: ApplicationStatus) -> (bool);
+  adminUpdateStudent: (loginId: text, password: text, id: StudentId, input:
+   StudentUpdateInput) -> (bool);
+  adminUpdateStudentProfilePicture: (loginId: text, password: text,
+   studentId: StudentId, pictureData: text) -> (bool);
+  getApplication: (id: ApplicationId) -> (opt AdmissionApplicationView) query;
+  getCertificate: (id: CertificateId) -> (opt Certificate) query;
+  getCourse: (id: text) -> (opt Course) query;
+  getMyAttendance: (studentId: StudentId) ->
+   (record {
+      records: vec AttendanceRecord;
+      summary: AttendanceSummary;
+    }) query;
+  getMyLeaveRequests: (studentId: StudentId) -> (vec LeaveRequestView) query;
+  getNotice: (id: NoticeId) -> (opt Notice) query;
+  getStudentCertificates: (studentId: StudentId) -> (vec Certificate) query;
+  getStudentDashboard: (id: StudentId) -> (opt StudentView) query;
+  listCourses: () -> (vec Course) query;
+  listNotices: () -> (vec Notice) query;
+  studentLogin: (username: text, password: text) -> (opt StudentView);
+  studentUpdateProfilePicture: (studentId: StudentId, pictureData: text) ->
+   (bool);
+  submitApplication: (input: ApplicationInput) -> (AdmissionApplicationView);
+  submitLeaveRequest: (studentId: StudentId, input: LeaveRequestInput) ->
+   (LeaveRequestView);
+}

@@ -1,0 +1,23 @@
+{
+  "overview": "AR Computer Education is a comprehensive institute management website for a computer education center. Students can apply for admission, track applications, log into a personal dashboard to view attendance, apply for leave, and download certificates. Administrators have a full management portal to oversee students, applications, attendance, leave requests, notices, and certificates.",
+  "features": [
+    "Student dashboard with attendance tracking and leave requests",
+    "Profile picture upload for students",
+    "Certificate download for students",
+    "Admin delete capability across all tools",
+    "Admin leave request approval workflow",
+    "Home page with course catalog showing all benefits",
+    "Recent notices on home page",
+    "Visual improvements to home page",
+    "Admin manage all student details"
+  ],
+  "category": "education",
+  "tags": [
+    "education",
+    "student-management",
+    "attendance",
+    "certificates",
+    "admin-dashboard"
+  ],
+  "last_updated": "2026-04-10T15:05:23.665Z"
+}

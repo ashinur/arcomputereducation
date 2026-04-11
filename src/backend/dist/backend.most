@@ -1,0 +1,211 @@
+// Version: 3.0.0
+type AdmissionApplication__212363811 =
+  {
+    aadhaar : ?ExternalBlob__246066408;
+    courseId : CourseId__927523888;
+    email : Text;
+    id : ApplicationId__702901380;
+    marksheet10 : ?ExternalBlob__246066408;
+    marksheet12 : ?ExternalBlob__246066408;
+    name : Text;
+    passCertificate : ?ExternalBlob__246066408;
+    phone : Text;
+    photo : ?ExternalBlob__246066408;
+    var status : ApplicationStatus__511886962;
+    submittedAt : Timestamp__301639476
+  };
+type AdmissionApplication__877478463 = AdmissionApplication__212363811;
+type ApplicationId__702901380 = Nat;
+type ApplicationStatus__511886962 = {#approved; #pending; #rejected};
+type AttendanceId__91187254 = Nat;
+type AttendanceRecord__577914640 = AttendanceRecord__699091857;
+type AttendanceRecord__699091857 =
+  {
+    date : Text;
+    id : AttendanceId__91187254;
+    markedAt : Timestamp__301639476;
+    status : AttendanceStatus__1042496195;
+    studentId : StudentId__585118929
+  };
+type AttendanceStatus__1042496195 = {#absent; #late; #present};
+type CertificateId__417577722 = Nat;
+type Certificate__111188169 = Certificate__592097419;
+type Certificate__592097419 =
+  {
+    certificateCode : Text;
+    courseId : CourseId__927523888;
+    courseName : Text;
+    id : CertificateId__417577722;
+    issuedAt : Timestamp__301639476;
+    studentId : StudentId__585118929;
+    studentName : Text
+  };
+type CourseId__927523888 = Text;
+type Course__102733780 = Course__321233390;
+type Course__321233390 =
+  {
+    benefits : [Text];
+    description : Text;
+    durationMonths : Nat;
+    id : CourseId__927523888;
+    name : Text
+  };
+type ExternalBlob__246066408 = Blob;
+type LeaveRequestId__1047857620 = Nat;
+type LeaveRequest__780725885 = LeaveRequest__796615821;
+type LeaveRequest__796615821 =
+  {
+    endDate : Text;
+    id : LeaveRequestId__1047857620;
+    var leaveStatus : LeaveStatus__42423039;
+    reason : Text;
+    var respondedAt : ?Timestamp__301639476;
+    startDate : Text;
+    studentId : StudentId__585118929;
+    submittedAt : Timestamp__301639476
+  };
+type LeaveStatus__42423039 = {#approved; #pending; #rejected};
+type List__415060402<T> = List__790383201<T>;
+type List__790383201<T> =
+  {
+    var blockIndex : Nat__490723111;
+    var blocks : [var [var ?T]];
+    var elementIndex : Nat__490723111
+  };
+type Nat__490723111 = Nat__920180692;
+type Nat__920180692 = Nat;
+type NoticeId__539436524 = Nat;
+type Notice__313028600 =
+  {
+    content : Text;
+    id : NoticeId__539436524;
+    postedAt : Timestamp__301639476;
+    title : Text
+  };
+type Notice__38796809 = Notice__313028600;
+type OldCourse__138436238 =
+  {
+    description : Text;
+    durationMonths : Nat;
+    id : CourseId__927523888;
+    name : Text
+  };
+type OldStudent__333394504 =
+  {
+    applicationId : ?ApplicationId__702901380;
+    var courseId : CourseId__927523888;
+    createdAt : Timestamp__301639476;
+    var email : Text;
+    var enrolled : Bool;
+    id : StudentId__585118929;
+    var name : Text;
+    var passwordHash : Text;
+    var phone : Text;
+    var username : Text
+  };
+type StudentId__585118929 = Nat;
+type Student__26715999 =
+  {
+    applicationId : ?ApplicationId__702901380;
+    var courseId : CourseId__927523888;
+    createdAt : Timestamp__301639476;
+    var email : Text;
+    var enrolled : Bool;
+    id : StudentId__585118929;
+    var name : Text;
+    var passwordHash : Text;
+    var phone : Text;
+    var profilePicture : ?Text;
+    var username : Text
+  };
+type Student__997261203 = Student__26715999;
+type Timestamp__301639476 = Int;
+actor ({
+  stable var _nextApplicationId : Nat;
+  stable var _nextAttendanceId : Nat;
+  stable var _nextCertId : Nat;
+  stable var _nextLeaveId : Nat;
+  stable var _nextNoticeId : Nat;
+  stable var _nextStudentId : Nat;
+  stable applications :
+    {
+      var blockIndex : Nat__490723111;
+      var blocks : [var [var ?AdmissionApplication__877478463]];
+      var elementIndex : Nat__490723111
+    };
+  stable attendance :
+    {
+      var blockIndex : Nat__490723111;
+      var blocks : [var [var ?AttendanceRecord__577914640]];
+      var elementIndex : Nat__490723111
+    };
+  stable certificates :
+    {
+      var blockIndex : Nat__490723111;
+      var blocks : [var [var ?Certificate__111188169]];
+      var elementIndex : Nat__490723111
+    };
+  in courses : List__415060402<OldCourse__138436238>;
+  stable leaveRequests :
+    {
+      var blockIndex : Nat__490723111;
+      var blocks : [var [var ?LeaveRequest__780725885]];
+      var elementIndex : Nat__490723111
+    };
+  stable notices :
+    {
+      var blockIndex : Nat__490723111;
+      var blocks : [var [var ?Notice__38796809]];
+      var elementIndex : Nat__490723111
+    };
+  in students : List__415060402<OldStudent__333394504>
+}, {
+  stable var _nextApplicationId : Nat;
+  stable var _nextAttendanceId : Nat;
+  stable var _nextCertId : Nat;
+  stable var _nextLeaveId : Nat;
+  stable var _nextNoticeId : Nat;
+  stable var _nextStudentId : Nat;
+  stable applications :
+    {
+      var blockIndex : Nat__490723111;
+      var blocks : [var [var ?AdmissionApplication__877478463]];
+      var elementIndex : Nat__490723111
+    };
+  stable attendance :
+    {
+      var blockIndex : Nat__490723111;
+      var blocks : [var [var ?AttendanceRecord__577914640]];
+      var elementIndex : Nat__490723111
+    };
+  stable certificates :
+    {
+      var blockIndex : Nat__490723111;
+      var blocks : [var [var ?Certificate__111188169]];
+      var elementIndex : Nat__490723111
+    };
+  stable courses :
+    {
+      var blockIndex : Nat__490723111;
+      var blocks : [var [var ?Course__102733780]];
+      var elementIndex : Nat__490723111
+    };
+  stable leaveRequests :
+    {
+      var blockIndex : Nat__490723111;
+      var blocks : [var [var ?LeaveRequest__780725885]];
+      var elementIndex : Nat__490723111
+    };
+  stable notices :
+    {
+      var blockIndex : Nat__490723111;
+      var blocks : [var [var ?Notice__38796809]];
+      var elementIndex : Nat__490723111
+    };
+  stable students :
+    {
+      var blockIndex : Nat__490723111;
+      var blocks : [var [var ?Student__997261203]];
+      var elementIndex : Nat__490723111
+    }
+}) ;
