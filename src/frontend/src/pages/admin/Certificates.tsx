@@ -19,73 +19,16 @@ import { Award, Download, Loader2, Plus, Printer, Trash2 } from "lucide-react";
 import { motion } from "motion/react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { useAdminAuth } from "../../hooks/useAuth";
+import { ConfirmDeleteDialog } from "../../components/ConfirmDeleteDialog";
+import { useAdminCredentials } from "../../hooks/useAuth";
 import {
   useAdminDeleteCertificate,
   useAdminIssueCertificate,
   useAdminListCertificates,
   useAdminListStudents,
 } from "../../hooks/useBackend";
+import { formatTimestamp } from "../../lib/format";
 import type { Certificate, CertificateId, StudentId } from "../../types";
-
-function formatDate(timestamp: bigint): string {
-  const ms = Number(timestamp) / 1_000_000;
-  return new Date(ms).toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
-}
-
-function ConfirmDeleteDialog({
-  open,
-  certName,
-  onConfirm,
-  onCancel,
-  isLoading,
-}: {
-  open: boolean;
-  certName: string;
-  onConfirm: () => void;
-  onCancel: () => void;
-  isLoading: boolean;
-}) {
-  if (!open) return null;
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-card rounded-xl border border-border shadow-elevated p-6 max-w-sm w-full mx-4">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center">
-            <Trash2 size={18} className="text-destructive" />
-          </div>
-          <h3 className="font-display font-semibold text-foreground">
-            Delete Certificate
-          </h3>
-        </div>
-        <p className="text-sm text-muted-foreground mb-5">
-          Are you sure you want to delete the certificate for{" "}
-          <span className="font-semibold text-foreground">{certName}</span>?
-          This cannot be undone.
-        </p>
-        <div className="flex gap-3">
-          <Button
-            variant="destructive"
-            className="flex-1"
-            onClick={onConfirm}
-            disabled={isLoading}
-            data-ocid="confirm-delete-cert-btn"
-          >
-            {isLoading && <Loader2 size={14} className="animate-spin mr-2" />}
-            Delete
-          </Button>
-          <Button variant="outline" className="flex-1" onClick={onCancel}>
-            Cancel
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 /** Styled certificate card for printing */
 function CertificatePrintView({ cert }: { cert: Certificate }) {
@@ -224,7 +167,7 @@ function CertificatePrintView({ cert }: { cert: Certificate }) {
             Date of Issue
           </div>
           <div style={{ fontSize: 14, color: "#e2e8f0", fontWeight: "bold" }}>
-            {formatDate(cert.issuedAt)}
+            {formatTimestamp(cert.issuedAt)}
           </div>
         </div>
         <div style={{ textAlign: "center" }}>
@@ -298,7 +241,7 @@ function CertCard({
               {cert.certificateCode}
             </span>
           </div>
-          <div>Issued: {formatDate(cert.issuedAt)}</div>
+          <div>Issued: {formatTimestamp(cert.issuedAt)}</div>
         </div>
         <div className="flex gap-2">
           <Button
@@ -326,9 +269,7 @@ function CertCard({
 }
 
 export default function AdminCertificatesPage() {
-  const { admin } = useAdminAuth();
-  const loginId = admin?.loginId ?? "";
-  const password = admin?.password ?? "";
+  const { loginId, password } = useAdminCredentials();
 
   const { data: certificates, isLoading } = useAdminListCertificates(
     loginId,
@@ -404,10 +345,20 @@ export default function AdminCertificatesPage() {
     <div>
       <ConfirmDeleteDialog
         open={!!deleteTarget}
-        certName={deleteTarget?.studentName ?? ""}
+        title="Delete Certificate"
+        description={
+          <>
+            Are you sure you want to delete the certificate for{" "}
+            <span className="font-semibold text-foreground">
+              {deleteTarget?.studentName ?? ""}
+            </span>
+            ? This cannot be undone.
+          </>
+        }
         onConfirm={handleDeleteConfirm}
         onCancel={() => setDeleteTarget(null)}
         isLoading={deleteMutation.isPending}
+        confirmOcid="confirm-delete-cert-btn"
       />
 
       <section className="bg-card border-b border-border py-8">

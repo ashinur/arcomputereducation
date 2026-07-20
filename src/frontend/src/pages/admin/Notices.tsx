@@ -22,77 +22,18 @@ import {
 import { motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useAdminAuth } from "../../hooks/useAuth";
+import { ConfirmDeleteDialog } from "../../components/ConfirmDeleteDialog";
+import { useAdminCredentials } from "../../hooks/useAuth";
 import {
   useAdminDeleteNotice,
   useAdminPostNotice,
   useListNotices,
 } from "../../hooks/useBackend";
+import { formatTimestamp } from "../../lib/format";
 import type { Notice, NoticeId } from "../../types";
 
-function formatDate(timestamp: bigint): string {
-  const ms = Number(timestamp) / 1_000_000;
-  return new Date(ms).toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
-}
-
-function ConfirmDeleteDialog({
-  open,
-  title,
-  onConfirm,
-  onCancel,
-  isLoading,
-}: {
-  open: boolean;
-  title: string;
-  onConfirm: () => void;
-  onCancel: () => void;
-  isLoading: boolean;
-}) {
-  if (!open) return null;
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-card rounded-xl border border-border shadow-elevated p-6 max-w-sm w-full mx-4">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center">
-            <Trash2 size={18} className="text-destructive" />
-          </div>
-          <h3 className="font-display font-semibold text-foreground">
-            Delete Notice
-          </h3>
-        </div>
-        <p className="text-sm text-muted-foreground mb-5">
-          Are you sure you want to delete the notice{" "}
-          <span className="font-semibold text-foreground">"{title}"</span>? This
-          cannot be undone.
-        </p>
-        <div className="flex gap-3">
-          <Button
-            variant="destructive"
-            className="flex-1"
-            onClick={onConfirm}
-            disabled={isLoading}
-            data-ocid="confirm-delete-notice-btn"
-          >
-            {isLoading && <Loader2 size={14} className="animate-spin mr-2" />}
-            Delete
-          </Button>
-          <Button variant="outline" className="flex-1" onClick={onCancel}>
-            Cancel
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function AdminNoticesPage() {
-  const { admin } = useAdminAuth();
-  const loginId = admin?.loginId ?? "";
-  const password = admin?.password ?? "";
+  const { loginId, password } = useAdminCredentials();
 
   const { data: notices, isLoading } = useListNotices();
   const postMutation = useAdminPostNotice(loginId, password);
@@ -138,10 +79,20 @@ export default function AdminNoticesPage() {
     <div>
       <ConfirmDeleteDialog
         open={!!deleteTarget}
-        title={deleteTarget?.title ?? ""}
+        title="Delete Notice"
+        description={
+          <>
+            Are you sure you want to delete the notice{" "}
+            <span className="font-semibold text-foreground">
+              "{deleteTarget?.title ?? ""}"
+            </span>
+            ? This cannot be undone.
+          </>
+        }
         onConfirm={handleDeleteConfirm}
         onCancel={() => setDeleteTarget(null)}
         isLoading={deleteMutation.isPending}
+        confirmOcid="confirm-delete-notice-btn"
       />
 
       <section className="bg-card border-b border-border py-8">
@@ -265,7 +216,7 @@ export default function AdminNoticesPage() {
                               </h3>
                               <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
                                 <CalendarDays size={11} />
-                                <span>{formatDate(notice.postedAt)}</span>
+                                <span>{formatTimestamp(notice.postedAt)}</span>
                               </div>
                               <p className="text-sm text-muted-foreground leading-relaxed">
                                 {notice.content}

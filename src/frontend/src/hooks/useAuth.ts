@@ -41,6 +41,18 @@ export function useAdminAuth() {
   };
 }
 
+/**
+ * Convenience hook returning the admin credentials required by the backend
+ * admin hooks, defaulting to empty strings when not authenticated.
+ */
+export function useAdminCredentials() {
+  const { admin } = useAdminAuth();
+  return {
+    loginId: admin?.loginId ?? "",
+    password: admin?.password ?? "",
+  };
+}
+
 export function useStudentAuth() {
   const { student, setStudent, clearStudent } = useAuthStore();
   return {
