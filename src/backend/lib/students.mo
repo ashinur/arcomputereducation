@@ -2,6 +2,8 @@ import List "mo:core/List";
 import Time "mo:core/Time";
 import Types "../types/students";
 import CommonTypes "../types/common";
+import Crypto "crypto";
+import Validate "validate";
 
 module {
   public type Student = Types.Student;
@@ -24,9 +26,9 @@ module {
     };
   };
 
-  // Simple password storage (no real hashing on ICP — store as-is or use a trivial transform)
+  // One-way SHA-256 hash so plaintext passwords are never persisted in state.
   public func hashPassword(password : Text) : Text {
-    password;
+    Crypto.hashSecret(password);
   };
 
   public func createStudent(
@@ -34,6 +36,9 @@ module {
     nextId : Nat,
     input : StudentInput,
   ) : StudentView {
+    Validate.requireText(input.username, "username", 3, 40);
+    Validate.requireText(input.password, "password", 6, 200);
+    Validate.requireText(input.name, "name", 1, 100);
     let student : Student = {
       id = nextId;
       var username = input.username;

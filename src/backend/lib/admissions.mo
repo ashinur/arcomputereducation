@@ -2,6 +2,7 @@ import List "mo:core/List";
 import Time "mo:core/Time";
 import Types "../types/admissions";
 import CommonTypes "../types/common";
+import Validate "validate";
 
 module {
   public type AdmissionApplication = Types.AdmissionApplication;
@@ -30,6 +31,10 @@ module {
     nextId : Nat,
     input : ApplicationInput,
   ) : AdmissionApplicationView {
+    Validate.requireText(input.name, "name", 1, 100);
+    Validate.requireText(input.email, "email", 3, 254);
+    Validate.requireText(input.phone, "phone", 3, 20);
+    Validate.requireText(input.courseId, "courseId", 1, 64);
     let app : AdmissionApplication = {
       id = nextId;
       name = input.name;
