@@ -118,7 +118,8 @@ export default function AdminNoticesPage() {
       setTitle("");
       setContent("");
       setOpen(false);
-    } catch {
+    } catch (err) {
+      console.error("Failed to post notice:", err);
       toast.error("Failed to post notice. Please try again.");
     }
   };
@@ -126,10 +127,18 @@ export default function AdminNoticesPage() {
   const handleDeleteConfirm = async () => {
     if (!deleteTarget) return;
     try {
-      await deleteMutation.mutateAsync(deleteTarget.id as NoticeId);
+      const deleted = await deleteMutation.mutateAsync(
+        deleteTarget.id as NoticeId,
+      );
+      if (!deleted) {
+        toast.error("Notice could not be found. It may already be deleted.");
+        setDeleteTarget(null);
+        return;
+      }
       toast.success("Notice deleted.");
       setDeleteTarget(null);
-    } catch {
+    } catch (err) {
+      console.error("Failed to delete notice:", err);
       toast.error("Failed to delete notice.");
     }
   };

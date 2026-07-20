@@ -169,7 +169,8 @@ function AttendancePanel({
         status: markStatus as AttendanceStatus,
       });
       toast.success("Attendance marked successfully.");
-    } catch {
+    } catch (err) {
+      console.error("Failed to mark attendance:", err);
       toast.error("Failed to mark attendance.");
     }
   };
@@ -445,7 +446,8 @@ export default function AdminStudentsPage() {
       toast.success("Student account created successfully.");
       setCreateOpen(false);
       setNewForm(EMPTY_CREATE);
-    } catch {
+    } catch (err) {
+      console.error("Failed to create student account:", err);
       toast.error("Failed to create student account.");
     }
   };
@@ -454,7 +456,7 @@ export default function AdminStudentsPage() {
     e.preventDefault();
     if (!editStudent) return;
     try {
-      await updateMutation.mutateAsync({
+      const updated = await updateMutation.mutateAsync({
         id: editStudent.id,
         input: {
           name: editForm.name || undefined,
@@ -464,9 +466,14 @@ export default function AdminStudentsPage() {
           enrolled: editForm.enrolled,
         },
       });
+      if (!updated) {
+        toast.error("Student could not be found. They may have been deleted.");
+        return;
+      }
       toast.success("Student updated successfully.");
       setEditStudent(null);
-    } catch {
+    } catch (err) {
+      console.error("Failed to update student:", err);
       toast.error("Failed to update student.");
     }
   };
@@ -474,10 +481,18 @@ export default function AdminStudentsPage() {
   const handleDeleteConfirm = async () => {
     if (!deleteTarget) return;
     try {
-      await deleteMutation.mutateAsync(deleteTarget.id as StudentId);
+      const deleted = await deleteMutation.mutateAsync(
+        deleteTarget.id as StudentId,
+      );
+      if (!deleted) {
+        toast.error("Student could not be found. They may already be deleted.");
+        setDeleteTarget(null);
+        return;
+      }
       toast.success(`${deleteTarget.name} deleted.`);
       setDeleteTarget(null);
-    } catch {
+    } catch (err) {
+      console.error("Failed to delete student:", err);
       toast.error("Failed to delete student.");
     }
   };

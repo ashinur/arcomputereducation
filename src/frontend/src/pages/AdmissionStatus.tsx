@@ -7,6 +7,7 @@ import { Link } from "@tanstack/react-router";
 import { CheckCircle, Clock, FileText, Search, XCircle } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
+import { toast } from "sonner";
 import { useGetApplication } from "../hooks/useBackend";
 import { ApplicationStatus } from "../types";
 
@@ -53,8 +54,10 @@ export default function AdmissionStatusPage() {
     if (!trimmed) return;
     try {
       setSearchId(BigInt(trimmed));
-    } catch {
+    } catch (err) {
+      console.error("Invalid application ID:", err);
       setSearchId(undefined);
+      toast.error("Please enter a valid numeric application ID.");
     }
   };
 

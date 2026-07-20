@@ -47,7 +47,8 @@ export default function StudentLoginPage() {
           "Invalid username or password. Please check your credentials and try again.",
         );
       }
-    } catch {
+    } catch (err) {
+      console.error("Student login request failed:", err);
       setError("Login failed. Please try again later.");
     }
   };

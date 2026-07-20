@@ -357,7 +357,8 @@ export default function AdminCertificatesPage() {
       toast.success("Certificate issued successfully.");
       setIssueOpen(false);
       setSelectedStudentId("");
-    } catch {
+    } catch (err) {
+      console.error("Failed to issue certificate:", err);
       toast.error("Failed to issue certificate.");
     }
   };
@@ -365,10 +366,20 @@ export default function AdminCertificatesPage() {
   const handleDeleteConfirm = async () => {
     if (!deleteTarget) return;
     try {
-      await deleteMutation.mutateAsync(deleteTarget.id as CertificateId);
+      const deleted = await deleteMutation.mutateAsync(
+        deleteTarget.id as CertificateId,
+      );
+      if (!deleted) {
+        toast.error(
+          "Certificate could not be found. It may already be deleted.",
+        );
+        setDeleteTarget(null);
+        return;
+      }
       toast.success("Certificate deleted.");
       setDeleteTarget(null);
-    } catch {
+    } catch (err) {
+      console.error("Failed to delete certificate:", err);
       toast.error("Failed to delete certificate.");
     }
   };
@@ -376,7 +387,12 @@ export default function AdminCertificatesPage() {
   const triggerPrint = () => {
     if (!printRef.current || !printCert) return;
     const printWindow = window.open("", "_blank");
-    if (!printWindow) return;
+    if (!printWindow) {
+      toast.error(
+        "Unable to open the print window. Please allow pop-ups for this site.",
+      );
+      return;
+    }
     printWindow.document.write(`
       <!DOCTYPE html>
       <html>
