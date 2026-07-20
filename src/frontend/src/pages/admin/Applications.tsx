@@ -148,12 +148,19 @@ export default function AdminApplicationsPage() {
 
   const handleStatusChange = async (id: bigint, status: ApplicationStatus) => {
     try {
-      await updateMutation.mutateAsync({ id, status });
+      const updated = await updateMutation.mutateAsync({ id, status });
+      if (!updated) {
+        toast.error(
+          "Application could not be found. It may have been deleted.",
+        );
+        return;
+      }
       toast.success("Application status updated.");
       if (selectedApp?.id === id) {
         setSelectedApp((prev) => (prev ? { ...prev, status } : null));
       }
-    } catch {
+    } catch (err) {
+      console.error("Failed to update application status:", err);
       toast.error("Failed to update status.");
     }
   };
@@ -161,10 +168,20 @@ export default function AdminApplicationsPage() {
   const handleDeleteConfirm = async () => {
     if (!deleteTarget) return;
     try {
-      await deleteMutation.mutateAsync(deleteTarget.id as ApplicationId);
+      const deleted = await deleteMutation.mutateAsync(
+        deleteTarget.id as ApplicationId,
+      );
+      if (!deleted) {
+        toast.error(
+          "Application could not be found. It may already be deleted.",
+        );
+        setDeleteTarget(null);
+        return;
+      }
       toast.success("Application deleted.");
       setDeleteTarget(null);
-    } catch {
+    } catch (err) {
+      console.error("Failed to delete application:", err);
       toast.error("Failed to delete application.");
     }
   };

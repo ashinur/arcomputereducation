@@ -40,7 +40,8 @@ export default function AdminLoginPage() {
           "Invalid login credentials. Please check your login ID and password.",
         );
       }
-    } catch {
+    } catch (err) {
+      console.error("Admin login request failed:", err);
       setError("Login failed. Please try again.");
     }
   };

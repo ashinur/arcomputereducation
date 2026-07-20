@@ -146,12 +146,29 @@ function ProfilePictureSection({
     }
     const reader = new FileReader();
     reader.onload = (ev) => {
-      const base64 = ev.target?.result as string;
+      const base64 = ev.target?.result;
+      if (typeof base64 !== "string") {
+        toast.error("Could not read the selected image. Please try again.");
+        return;
+      }
       setPreview(base64);
       uploadMutation.mutate(base64, {
-        onSuccess: () => toast.success("Profile picture updated!"),
-        onError: () => toast.error("Failed to update profile picture."),
+        onSuccess: (updated) => {
+          if (updated) {
+            toast.success("Profile picture updated!");
+          } else {
+            toast.error("Failed to update profile picture.");
+          }
+        },
+        onError: (err) => {
+          console.error("Failed to update profile picture:", err);
+          toast.error("Failed to update profile picture.");
+        },
       });
+    };
+    reader.onerror = () => {
+      console.error("Failed to read image file:", reader.error);
+      toast.error("Could not read the selected image. Please try again.");
     };
     reader.readAsDataURL(file);
   };
@@ -371,7 +388,10 @@ function LeaveSection({ studentId }: { studentId: bigint }) {
           setReason("");
           setShowForm(false);
         },
-        onError: () => toast.error("Failed to submit leave request."),
+        onError: (err) => {
+          console.error("Failed to submit leave request:", err);
+          toast.error("Failed to submit leave request.");
+        },
       },
     );
   };

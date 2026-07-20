@@ -221,11 +221,18 @@ export default function AdminLeavePage() {
   const handleReview = async (id: bigint, status: LeaveStatus) => {
     setReviewingId(id);
     try {
-      await reviewMutation.mutateAsync({ id, status });
+      const updated = await reviewMutation.mutateAsync({ id, status });
+      if (!updated) {
+        toast.error(
+          "Leave request could not be found. It may have been deleted.",
+        );
+        return;
+      }
       toast.success(
         status === LeaveStatus.approved ? "Leave approved" : "Leave rejected",
       );
-    } catch {
+    } catch (err) {
+      console.error("Failed to update leave request:", err);
       toast.error("Failed to update leave request");
     } finally {
       setReviewingId(null);
@@ -235,10 +242,20 @@ export default function AdminLeavePage() {
   const handleDeleteConfirm = async () => {
     if (!deleteTarget) return;
     try {
-      await deleteMutation.mutateAsync(deleteTarget.id as LeaveRequestId);
+      const deleted = await deleteMutation.mutateAsync(
+        deleteTarget.id as LeaveRequestId,
+      );
+      if (!deleted) {
+        toast.error(
+          "Leave request could not be found. It may already be deleted.",
+        );
+        setDeleteTarget(null);
+        return;
+      }
       toast.success("Leave request deleted");
       setDeleteTarget(null);
-    } catch {
+    } catch (err) {
+      console.error("Failed to delete leave request:", err);
       toast.error("Failed to delete leave request");
     }
   };

@@ -211,7 +211,8 @@ export default function AdmissionPage() {
       setApplicationId(result.id);
       setSubmitted(true);
       toast.success("Application submitted successfully!");
-    } catch {
+    } catch (err) {
+      console.error("Failed to submit application:", err);
       toast.error("Failed to submit application. Please try again.");
     }
   };
