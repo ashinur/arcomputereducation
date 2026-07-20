@@ -32,3 +32,4 @@ args = [
 [dependencies]
 core = "2.2.0"
 caffeineai-object-storage = "0.1.1"
+sha2 = "0.2.5"
