@@ -21,12 +21,14 @@ import { motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { LeaveStatus } from "../../backend";
-import { useAdminAuth } from "../../hooks/useAuth";
+import { ConfirmDeleteDialog } from "../../components/ConfirmDeleteDialog";
+import { useAdminCredentials } from "../../hooks/useAuth";
 import {
   useAdminDeleteLeaveRequest,
   useAdminListLeaveRequests,
   useReviewLeaveRequest,
 } from "../../hooks/useBackend";
+import { formatDateString } from "../../lib/format";
 import type { LeaveRequestId, LeaveRequestView } from "../../types";
 
 function statusBadge(status: LeaveStatus) {
@@ -44,65 +46,6 @@ function statusBadge(status: LeaveStatus) {
     <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">
       Pending
     </Badge>
-  );
-}
-
-function formatDate(dateStr: string) {
-  try {
-    return new Date(dateStr).toLocaleDateString("en-IN", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
-  } catch {
-    return dateStr;
-  }
-}
-
-function ConfirmDeleteDialog({
-  open,
-  onConfirm,
-  onCancel,
-  isLoading,
-}: {
-  open: boolean;
-  onConfirm: () => void;
-  onCancel: () => void;
-  isLoading: boolean;
-}) {
-  if (!open) return null;
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-card rounded-xl border border-border shadow-elevated p-6 max-w-sm w-full mx-4">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center">
-            <Trash2 size={18} className="text-destructive" />
-          </div>
-          <h3 className="font-display font-semibold text-foreground">
-            Delete Leave Request
-          </h3>
-        </div>
-        <p className="text-sm text-muted-foreground mb-5">
-          Are you sure you want to delete this leave request? This cannot be
-          undone.
-        </p>
-        <div className="flex gap-3">
-          <Button
-            variant="destructive"
-            className="flex-1"
-            onClick={onConfirm}
-            disabled={isLoading}
-            data-ocid="confirm-delete-leave-btn"
-          >
-            {isLoading && <Loader2 size={14} className="animate-spin mr-2" />}
-            Delete
-          </Button>
-          <Button variant="outline" className="flex-1" onClick={onCancel}>
-            Cancel
-          </Button>
-        </div>
-      </div>
-    </div>
   );
 }
 
@@ -131,9 +74,13 @@ function LeaveCard({
             <span className="font-mono">{request.studentId.toString()}</span>
           </p>
           <p className="text-xs text-muted-foreground">
-            <span className="font-medium">{formatDate(request.startDate)}</span>
+            <span className="font-medium">
+              {formatDateString(request.startDate)}
+            </span>
             {" → "}
-            <span className="font-medium">{formatDate(request.endDate)}</span>
+            <span className="font-medium">
+              {formatDateString(request.endDate)}
+            </span>
           </p>
           <p className="text-sm text-foreground/80 line-clamp-2">
             {request.reason}
@@ -193,9 +140,7 @@ function LeaveCard({
 }
 
 export default function AdminLeavePage() {
-  const { admin } = useAdminAuth();
-  const loginId = admin?.loginId ?? "";
-  const password = admin?.password ?? "";
+  const { loginId, password } = useAdminCredentials();
   const [filter, setFilter] = useState<string>("all");
   const [reviewingId, setReviewingId] = useState<bigint | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<LeaveRequestView | null>(
@@ -247,9 +192,12 @@ export default function AdminLeavePage() {
     <div>
       <ConfirmDeleteDialog
         open={!!deleteTarget}
+        title="Delete Leave Request"
+        description="Are you sure you want to delete this leave request? This cannot be undone."
         onConfirm={handleDeleteConfirm}
         onCancel={() => setDeleteTarget(null)}
         isLoading={deleteMutation.isPending}
+        confirmOcid="confirm-delete-leave-btn"
       />
 
       <section className="bg-card border-b border-border py-8">

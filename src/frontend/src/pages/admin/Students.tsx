@@ -35,7 +35,8 @@ import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AttendanceStatus } from "../../backend";
-import { useAdminAuth } from "../../hooks/useAuth";
+import { ConfirmDeleteDialog } from "../../components/ConfirmDeleteDialog";
+import { useAdminCredentials } from "../../hooks/useAuth";
 import {
   useAdminCreateStudent,
   useAdminDeleteStudent,
@@ -73,60 +74,6 @@ const EMPTY_CREATE: CreateForm = {
   username: "",
   password: "",
 };
-
-// ─── Confirmation Dialog ─────────────────────────────────────────────────────
-
-function ConfirmDeleteDialog({
-  open,
-  name,
-  onConfirm,
-  onCancel,
-  isLoading,
-}: {
-  open: boolean;
-  name: string;
-  onConfirm: () => void;
-  onCancel: () => void;
-  isLoading: boolean;
-}) {
-  if (!open) return null;
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-card rounded-xl border border-border shadow-elevated p-6 max-w-sm w-full mx-4">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center">
-            <Trash2 size={18} className="text-destructive" />
-          </div>
-          <h3 className="font-display font-semibold text-foreground">
-            Delete Student
-          </h3>
-        </div>
-        <p className="text-sm text-muted-foreground mb-5">
-          Are you sure you want to delete{" "}
-          <span className="font-semibold text-foreground">{name}</span>? This
-          cannot be undone.
-        </p>
-        <div className="flex gap-3">
-          <Button
-            variant="destructive"
-            className="flex-1"
-            onClick={onConfirm}
-            disabled={isLoading}
-            data-ocid="confirm-delete-btn"
-          >
-            {isLoading ? (
-              <Loader2 size={14} className="animate-spin mr-2" />
-            ) : null}
-            Delete
-          </Button>
-          <Button variant="outline" className="flex-1" onClick={onCancel}>
-            Cancel
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // ─── Attendance Panel ─────────────────────────────────────────────────────────
 
@@ -352,9 +299,7 @@ function StudentRow({
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function AdminStudentsPage() {
-  const { admin } = useAdminAuth();
-  const loginId = admin?.loginId ?? "";
-  const password = admin?.password ?? "";
+  const { loginId, password } = useAdminCredentials();
 
   const { data: students, isLoading } = useAdminListStudents(loginId, password);
   const createMutation = useAdminCreateStudent(loginId, password);
@@ -486,10 +431,20 @@ export default function AdminStudentsPage() {
     <div>
       <ConfirmDeleteDialog
         open={!!deleteTarget}
-        name={deleteTarget?.name ?? ""}
+        title="Delete Student"
+        description={
+          <>
+            Are you sure you want to delete{" "}
+            <span className="font-semibold text-foreground">
+              {deleteTarget?.name ?? ""}
+            </span>
+            ? This cannot be undone.
+          </>
+        }
         onConfirm={handleDeleteConfirm}
         onCancel={() => setDeleteTarget(null)}
         isLoading={deleteMutation.isPending}
+        confirmOcid="confirm-delete-btn"
       />
 
       <section className="bg-card border-b border-border py-8">

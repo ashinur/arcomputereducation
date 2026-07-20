@@ -13,7 +13,7 @@ import {
   Users,
 } from "lucide-react";
 import { motion } from "motion/react";
-import { useAdminAuth } from "../../hooks/useAuth";
+import { useAdminCredentials } from "../../hooks/useAuth";
 import {
   useAdminListApplications,
   useAdminListCertificates,
@@ -57,9 +57,7 @@ const adminNavItems = [
 ];
 
 export default function AdminDashboardPage() {
-  const { admin } = useAdminAuth();
-  const loginId = admin?.loginId ?? "";
-  const password = admin?.password ?? "";
+  const { loginId, password } = useAdminCredentials();
 
   const { data: students, isLoading: loadingStudents } = useAdminListStudents(
     loginId,

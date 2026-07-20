@@ -5,15 +5,7 @@ import { Link } from "@tanstack/react-router";
 import { Bell, CalendarDays, GraduationCap } from "lucide-react";
 import { motion } from "motion/react";
 import { useListNotices } from "../hooks/useBackend";
-
-function formatDate(timestamp: bigint): string {
-  const ms = Number(timestamp) / 1_000_000;
-  return new Date(ms).toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
-}
+import { formatTimestamp } from "../lib/format";
 
 export default function NoticesPage() {
   const { data: notices, isLoading } = useListNotices();
@@ -76,7 +68,7 @@ export default function NoticesPage() {
                           </h3>
                           <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
                             <CalendarDays size={11} />
-                            <span>{formatDate(notice.postedAt)}</span>
+                            <span>{formatTimestamp(notice.postedAt)}</span>
                           </div>
                           <p className="text-sm text-muted-foreground leading-relaxed">
                             {notice.content}

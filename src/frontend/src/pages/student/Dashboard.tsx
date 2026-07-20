@@ -33,13 +33,14 @@ import {
   useStudentDashboard,
   useUploadProfilePicture,
 } from "../../hooks/useBackend";
+import { formatTimestamp } from "../../lib/format";
 import type { AttendanceRecord, LeaveRequestView } from "../../types";
 import { AttendanceStatus, COURSE_LIST, LeaveStatus } from "../../types";
 
 // ─── Utility helpers ──────────────────────────────────────────────────────────
 
 function formatDate(ts: bigint): string {
-  return new Date(Number(ts) / 1_000_000).toLocaleDateString("en-IN", {
+  return formatTimestamp(ts, {
     day: "numeric",
     month: "short",
     year: "numeric",
