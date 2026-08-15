@@ -1,16 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { GraduationCap, LogOut, Menu, ShieldCheck, X } from "lucide-react";
+import { Barcode, LogOut, Menu, ShieldCheck, X } from "lucide-react";
 import { useState } from "react";
 import { useIsMobile } from "../hooks/use-mobile";
 import { useAdminAuth, useStudentAuth } from "../hooks/useAuth";
 
 const navLinks = [
   { label: "Home", href: "/" },
-  { label: "Courses", href: "/courses" },
-  { label: "Admission", href: "/admission" },
-  { label: "Notice Board", href: "/notices" },
-  { label: "Contact", href: "/contact" },
+  { label: "Workflow", href: "/#workflow" },
+  { label: "Setup Help", href: "/contact" },
 ];
 
 export function Header() {
@@ -33,14 +31,14 @@ export function Header() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 group">
             <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center shadow-subtle group-hover:shadow-elevated transition-smooth">
-              <GraduationCap size={18} className="text-primary-foreground" />
+              <Barcode size={18} className="text-primary-foreground" />
             </div>
             <div className="leading-none">
               <div className="font-display font-bold text-foreground text-base">
-                AR Computer
+                Mobile POS
               </div>
               <div className="text-xs text-muted-foreground tracking-wide">
-                Education
+                Excel to app
               </div>
             </div>
           </Link>
@@ -93,7 +91,7 @@ export function Header() {
                 {!isMobile && (
                   <Link to="/student/dashboard">
                     <Button size="sm" variant="ghost" className="gap-1.5">
-                      <GraduationCap size={14} />
+                      <Barcode size={14} />
                       {student.name.split(" ")[0]}
                     </Button>
                   </Link>
@@ -118,8 +116,8 @@ export function Header() {
                     className="gap-1.5"
                     data-ocid="student-login-btn"
                   >
-                    <GraduationCap size={14} />
-                    {!isMobile && "Student Login"}
+                    <Barcode size={14} />
+                    {!isMobile && "Team Login"}
                     {isMobile && "Login"}
                   </Button>
                 </Link>
@@ -136,13 +134,13 @@ export function Header() {
                         Admin
                       </Button>
                     </Link>
-                    <Link to="/admission">
+                    <Link to="/contact">
                       <Button
                         size="sm"
                         className="bg-accent hover:bg-accent/90 text-accent-foreground gap-1.5"
                         data-ocid="apply-now-btn"
                       >
-                        Apply Now
+                        Get Setup Guide
                       </Button>
                     </Link>
                   </>
@@ -186,13 +184,13 @@ export function Header() {
               </Link>
             ))}
             <div className="mt-3 pt-3 border-t border-border space-y-2">
-              <Link to="/admission" onClick={() => setMenuOpen(false)}>
+              <Link to="/contact" onClick={() => setMenuOpen(false)}>
                 <Button
                   size="sm"
                   className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
                   data-ocid="mobile-apply-btn"
                 >
-                  Apply for Admission
+                  Get setup guide
                 </Button>
               </Link>
               {!admin?.isAuthenticated && !student?.isAuthenticated && (
